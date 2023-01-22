@@ -13,13 +13,13 @@ const googleSheets = google.sheets({
   auth: await auth.getClient(),
 });
 
-const worksheets = await googleSheets.spreadsheets.get({
+const spreadsheets = await googleSheets.spreadsheets.get({
   auth,
   spreadsheetId: <string>process.env.SPREADSHEET_ID,
 });
 
 const worksheetIdentifier = (<sheets_v4.Schema$Sheet[]>(
-  worksheets.data.sheets
+  spreadsheets.data.sheets
 )).map((val) => {
   const { properties: prop } = <
     { properties: sheets_v4.Schema$SheetProperties }
@@ -30,3 +30,23 @@ const worksheetIdentifier = (<sheets_v4.Schema$Sheet[]>(
     title: prop.title,
   };
 });
+
+const rawData = await googleSheets.spreadsheets.values.get({
+  auth,
+  spreadsheetId: <string>process.env.SPREADSHEET_ID,
+  range: `${worksheetIdentifier[0].title}!A1:Z1000`,
+});
+
+const rawDataClassification = (<string[][]>rawData.data.values)
+  .map((val, i, self) => {
+    if (i >= 1) {
+      const header = self[0];
+
+      return val.reduce(
+        (obj, _, j) => ({ ...obj, [header[j]]: self[i][j] }),
+        {}
+      );
+    }
+    return null;
+  })
+  .slice(1);
