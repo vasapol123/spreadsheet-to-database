@@ -1,0 +1,57 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model students {
+  id                    Int                     @id @default(autoincrement())
+  student_year          Int
+  enrollments           enrollments[]
+  grade_average_reports grade_average_reports[]
+}
+
+model courses {
+  id            Int           @id @default(autoincrement())
+  course_code   String        @unique
+  course_name   String
+  course_credit Int
+  enrollments   enrollments[]
+}
+
+model grade_reports {
+  id           Int          @id @default(autoincrement())
+  letter_grade String
+  number_grade Float
+  enrollment   enrollments?
+}
+
+model grade_average_reports {
+  id            Int    @id @default(autoincrement())
+  academic_year String
+  semester      String
+  gpa           Float
+  gpax          Float
+
+  student   students @relation(fields: [student_id], references: [id])
+  student_id Int
+}
+
+model enrollments {
+  id            Int    @id @default(autoincrement())
+  semester      String
+  academic_year String
+
+  student        students      @relation(fields: [student_id], references: [id])
+  student_id     Int
+  grade_report   grade_reports @relation(fields: [grade_report_id], references: [id])
+  grade_report_id Int           @unique
+  course         courses       @relation(fields: [course_id], references: [id])
+  course_id      Int
+}
