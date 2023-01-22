@@ -13,6 +13,7 @@ datasource db {
 model students {
   id                    Int                     @id @default(autoincrement())
   student_year          Int
+  hashed_student_code   String
   enrollments           enrollments[]
   grade_average_reports grade_average_reports[]
 }
@@ -39,7 +40,7 @@ model grade_average_reports {
   gpa           Float
   gpax          Float
 
-  student   students @relation(fields: [student_id], references: [id])
+  student    students @relation(fields: [student_id], references: [id])
   student_id Int
 }
 
@@ -48,10 +49,10 @@ model enrollments {
   semester      String
   academic_year String
 
-  student        students      @relation(fields: [student_id], references: [id])
-  student_id     Int
-  grade_report   grade_reports @relation(fields: [grade_report_id], references: [id])
+  student         students      @relation(fields: [student_id], references: [id])
+  student_id      Int
+  grade_report    grade_reports @relation(fields: [grade_report_id], references: [id])
   grade_report_id Int           @unique
-  course         courses       @relation(fields: [course_id], references: [id])
-  course_id      Int
+  course          courses       @relation(fields: [course_id], references: [id])
+  course_id       Int
 }
